@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biotek Race: Menuju Hulu - Fixed Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --font-base: 'Plus Jakarta Sans', sans-serif;
+      --font-size-xs: 12px;
+      --font-size-sm: 13px;
+      --font-size-md: 14px;
+      --font-size-lg: 15px;
+      --font-size-xl: 16px;
+
+      --team1-color: #e65100;
+      --team1-bg: rgba(255, 243, 224, 0.92);
+      --team2-color: #00695c;
+      --team2-bg: rgba(224, 242, 241, 0.92);
+      
+      --bio-color: #2e7d32;
+      --non-color: #c62828;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-base);
+      user-select: none;
+    }
+
+    body {
+      /* Direct Aesthetic Image Background dengan Fallback Gradient */
+      background: linear-gradient(135deg, rgba(224,242,254,0.8), rgba(240,253,244,0.8)), 
+                  url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      color: #1e293b;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      padding: 12px 16px;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* --- LOGIN SCREEN FIX --- */
+    #screen-login {
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .login-box {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      padding: 28px 36px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      text-align: center;
+      width: 460px;
+      max-width: 90vw;
+      border: 1px solid rgba(255,255,255,0.9);
+      position: relative;
+      z-index: 20;
+      pointer-events: auto;
+    }
+
+    .login-box h1 {
+      font-size: var(--font-size-xl);
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .login-box p {
+      font-size: var(--font-size-xs);
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      flex: 1;
+      text-align: left;
+    }
+
+    .input-group label {
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      outline: none;
+      user-select: auto; /* Memudahkan input teks di PID */
+      background: #ffffff;
+    }
+
+    .input-group input:focus {
+      border-color: #2563eb;
+    }
+
+    /* FIX TOMBOL ACTION */
+    .btn-action {
+      width: 100%;
+      padding: 14px 20px;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: var(--font-size-md);
+      font-weight: 800;
+      cursor: pointer;
+      pointer-events: auto !important;
+      position: relative;
+      z-index: 30;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:hover {
+      background: #1d4ed8;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-action:active {
+      transform: scale(0.97);
+    }
+
+    /* --- RIVER DASHBOARD --- */
+    .river-dashboard {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      padding: 8px 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .river-track {
+      position: relative;
+      height: 32px;
+      background: linear-gradient(90deg, #e0f2fe 0%, #bae6fd 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border: 1.5px solid #7dd3fc;
+      overflow: hidden;
+    }
+
+    .boat {
+      position: absolute;
+      left: 8px;
+      font-size: var(--font-size-md);
+      transition: left 0.4s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 5;
+    }
+
+    .boat-tag {
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 8px;
+      color: white;
+      white-space: nowrap;
+    }
+
+    .finish-tag {
+      position: absolute;
+      right: 12px;
+      font-weight: 800;
+      font-size: var(--font-size-xs);
+      color: #0369a1;
+    }
+
+    /* --- DUAL ARENA LAYOUT --- */
+    .split-arena {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex: 1;
+      height: calc(100% - 100px);
+    }
+
+    .team-zone {
+      border-radius: 16px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    .team-zone.team-1 { background: var(--team1-bg); border: 1.5px solid #ffe0b2; }
+    .team-zone.team-2 { background: var(--team2-bg); border: 1.5px solid #b2dfdb; }
+
+    .team-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .team-title {
+      font-size: var(--font-size-md);
+      font-weight: 800;
+    }
+    .team-1 .team-title { color: var(--team1-color); }
+    .team-2 .team-title { color: var(--team2-color); }
+
+    .score-badge {
+      background: #ffffff;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: var(--font-size-xs);
+    }
+
+    /* Drop Boxes */
+    .drop-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      height: 64px;
+    }
+
+    .drop-box {
+      border: 2px dashed #94a3b8;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .drop-box.bio-box { border-color: #86efac; }
+    .drop-box.non-box { border-color: #fca5a5; }
+
+    .drop-box h4 {
+      font-size: var(--font-size-xs);
+      font-weight: 800;
+    }
+    .drop-box.bio-box h4 { color: var(--bio-color); }
+    .drop-box.non-box h4 { color: var(--non-color); }
+
+    .drop-box p {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    /* GRID 8 x 5 ITEM POOL */
+    .card-deck {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      padding: 6px;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 4px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .item-card {
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      cursor: grab;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      transition: transform 0.1s, border-color 0.1s;
+    }
+
+    .item-card.selected {
+      border-color: #2563eb !important;
+      background: #eff6ff !important;
+      transform: scale(1.05);
+    }
+
+    .item-card .icon {
+      font-size: var(--font-size-lg);
+      line-height: 1;
+      margin-bottom: 2px;
+      pointer-events: none;
+    }
+
+    .item-card .name {
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      color: #334155;
+      pointer-events: none;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* CERTIFICATE SCREEN */
+    #screen-cert {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .certificate {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      width: 80%;
+      max-width: 650px;
+      border: 8px solid #d97706;
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    .certificate h2 {
+      font-size: var(--font-size-sm);
+      letter-spacing: 2px;
+      color: #b45309;
+      margin-bottom: 6px;
+    }
+
+    .certificate h1 {
+      font-size: var(--font-size-xl);
+      font-weight: 800;
+      color: #78350f;
+      margin-bottom: 12px;
+    }
+
+    .winner-box {
+      font-size: var(--font-size-lg);
+      font-weight: 800;
+      color: #2563eb;
+      margin: 12px 0;
+      padding: 6px 20px;
+      background: #eff6ff;
+      display: inline-block;
+      border-radius: 12px;
+      border: 1.5px dashed #93c5fd;
+    }
+
+    .certificate p {
+      font-size: var(--font-size-xs);
+      color: #475569;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SCREEN 1: LOGIN -->
+  <div id="screen-login" class="screen active">
+    <div class="login-box">
+      <h1>Biotek Race 🚣‍♂️</h1>
+      <p>Lomba Klasifikasi Bioteknologi IPA SMP Fase D</p>
+      
+      <div class="input-row">
+        <div class="input-group">
+          <label>Tim 1 (Kiri)</label>
+          <input type="text" id="input-team1" value="Tim Timun Mas">
+        </div>
+        <div class="input-group">
+          <label>Tim 2 (Kanan)</label>
+          <input type="text" id="input-team2" value="Tim Garuda">
+        </div>
+      </div>
+
+      <button type="button" class="btn-action" id="btn-start">MULAI PERTANDINGAN</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: GAME ARENA (SIMULTANEOUS 8x5 GRID) -->
+  <div id="screen-game" class="screen">
+    <!-- River Dashboard -->
+    <div class="river-dashboard">
+      <div class="river-track">
+        <div class="boat" id="boat-1">
+          🚣‍♂️ <span class="boat-tag" id="tag-team1" style="background: var(--team1-color);">Tim 1</span>
+        </div>
+        <div class="finish-tag">HULU 🚩</div>
+      </div>
+      <div class="river-track">
+        <div class="boat" id="boat-2">
+          🚣‍♀️ <span class="boat-tag" id="tag-team2" style="background: var(--team2-color);">Tim 2</span>
+        </div>
+        <div class="finish-tag">HULU 🚩</div>
+      </div>
+    </div>
+
+    <!-- Dual Arena Split-Screen -->
+    <div class="split-arena">
+      <!-- TEAM 1 ARENA -->
+      <div class="team-zone team-1">
+        <div class="team-header">
+          <span class="team-title" id="title-team1">Tim 1</span>
+          <span class="score-badge" id="score-team1">Skor: 0 / 10</span>
+        </div>
+
+        <div class="drop-container">
+          <div class="drop-box bio-box" 
+               ondragover="allowDrop(event)" 
+               ondrop="handleDrop(event, 1, true)" 
+               onclick="handleBoxTap(1, true)">
+            <h4>Bioteknologi</h4>
+            <p>Fermentasi / Rekayasa</p>
+          </div>
+          <div class="drop-box non-box" 
+               ondragover="allowDrop(event)" 
+               ondrop="handleDrop(event, 1, false)" 
+               onclick="handleBoxTap(1, false)">
+            <h4>Bukan Biotek</h4>
+            <p>Alami / Fisik</p>
+          </div>
+        </div>
+
+        <div class="card-deck" id="deck-team1"></div>
+      </div>
+
+      <!-- TEAM 2 ARENA -->
+      <div class="team-zone team-2">
+        <div class="team-header">
+          <span class="team-title" id="title-team2">Tim 2</span>
+          <span class="score-badge" id="score-team2">Skor: 0 / 10</span>
+        </div>
+
+        <div class="drop-container">
+          <div class="drop-box bio-box" 
+               ondragover="allowDrop(event)" 
+               ondrop="handleDrop(event, 2, true)" 
+               onclick="handleBoxTap(2, true)">
+            <h4>Bioteknologi</h4>
+            <p>Fermentasi / Rekayasa</p>
+          </div>
+          <div class="drop-box non-box" 
+               ondragover="allowDrop(event)" 
+               ondrop="handleDrop(event, 2, false)" 
+               onclick="handleBoxTap(2, false)">
+            <h4>Bukan Biotek</h4>
+            <p>Alami / Fisik</p>
+          </div>
+        </div>
+
+        <div class="card-deck" id="deck-team2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: CERTIFICATE -->
+  <div id="screen-cert" class="screen">
+    <div class="certificate">
+      <h2>SERTIFIKAT PENGHARGAAN</h2>
+      <h1>JUARA 1 BIOTEK RACE</h1>
+      <p>Diberikan kepada tim terbaik:</p>
+      <div class="winner-box" id="cert-winner-name">NAMA TIM</div>
+      <p>Atas keberhasilan menguasai Materi Bioteknologi IPA SMP Fase D dan mencapai Hulu Sungai terlebih dahulu.</p>
+      <button type="button" class="btn-action" style="max-width: 220px; margin: 0 auto;" onclick="location.reload()">MAIN LAGI 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // --- DATABASE 40 GAMBAR/PRODUK (IPA FASE D) ---
+    const databaseItems = [
+      { id: 1, name: 'Tempe', isBio: true, icon: '🧀' },
+      { id: 2, name: 'Yoghurt', isBio: true, icon: '🥛' },
+      { id: 3, name: 'Keju', isBio: true, icon: '🧀' },
+      { id: 4, name: 'Kecap', isBio: true, icon: '🫙' },
+      { id: 5, name: 'Nata Coco', isBio: true, icon: '🥥' },
+      { id: 6, name: 'Tapai', isBio: true, icon: '🍠' },
+      { id: 7, name: 'Mentega', isBio: true, icon: '🧈' },
+      { id: 8, name: 'Oncom', isBio: true, icon: '🧱' },
+      { id: 9, name: 'Roti Ragi', isBio: true, icon: '🍞' },
+      { id: 10, name: 'Cuka Apel', isBio: true, icon: '🍾' },
+      { id: 11, name: 'Jagung Bt', isBio: true, icon: '🌽' },
+      { id: 12, name: 'Kedelai GMO', isBio: true, icon: '🫛' },
+      { id: 13, name: 'Golden Rice', isBio: true, icon: '🌾' },
+      { id: 14, name: 'Insulin', isBio: true, icon: '💉' },
+      { id: 15, name: 'Vaksin GMO', isBio: true, icon: '🧪' },
+      { id: 16, name: 'Penisilin', isBio: true, icon: '💊' },
+      { id: 17, name: 'PST Spirulina', isBio: true, icon: '🧫' },
+      { id: 18, name: 'Domba Dolly', isBio: true, icon: '🐑' },
+      { id: 19, name: 'Tomat Flavr', isBio: true, icon: '🍅' },
+      { id: 20, name: 'Kapas Bt', isBio: true, icon: '☁️' },
+      { id: 21, name: 'Mangga', isBio: false, icon: '🥭' },
+      { id: 22, name: 'Beras Merah', isBio: false, icon: '🍚' },
+      { id: 23, name: 'Jus Alpukat', isBio: false, icon: '🥑' },
+      { id: 24, name: 'Garam Laut', isBio: false, icon: '🧂' },
+      { id: 25, name: 'Apel Segar', isBio: false, icon: '🍎' },
+      { id: 26, name: 'VCO', isBio: false, icon: '🧴' },
+      { id: 27, name: 'Teh Hijau', isBio: false, icon: '🍵' },
+      { id: 28, name: 'Kopi Tubruk', isBio: false, icon: '☕' },
+      { id: 29, name: 'Gula Pasir', isBio: false, icon: '🍬' },
+      { id: 30, name: 'Wortel', isBio: false, icon: '🥕' },
+      { id: 31, name: 'Madu Murni', isBio: false, icon: '🍯' },
+      { id: 32, name: 'Susu Murni', isBio: false, icon: '🥛' },
+      { id: 33, name: 'Air Kelapa', isBio: false, icon: '🥤' },
+      { id: 34, name: 'Kentang', isBio: false, icon: '🍟' },
+      { id: 35, name: 'Saus Tomat', isBio: false, icon: '🥫' },
+      { id: 36, name: 'Tepung', isBio: false, icon: '🌾' },
+      { id: 37, name: 'Keripik', isBio: false, icon: '🍌' },
+      { id: 38, name: 'Es Batu', isBio: false, icon: '🧊' },
+      { id: 39, name: 'Minyak Zaitun', isBio: false, icon: '🫒' },
+      { id: 40, name: 'Cokelat', isBio: false, icon: '🍫' }
+    ];
+
+    const WIN_SCORE = 10;
+    let teams = {
+      1: { name: 'Tim 1', score: 0, selectedCard: null },
+      2: { name: 'Tim 2', score: 0, selectedCard: null }
+    };
+
+    // FIX EVENT LISTENER TOMBOL MULAI
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnStart = document.getElementById('btn-start');
+      if (btnStart) {
+        btnStart.addEventListener('click', initGame);
+        btnStart.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          initGame();
+        });
+      }
+    });
+
+    function initGame() {
+      const name1 = document.getElementById('input-team1').value.trim();
+      const name2 = document.getElementById('input-team2').value.trim();
+
+      teams[1].name = name1 || 'Tim 1';
+      teams[2].name = name2 || 'Tim 2';
+
+      document.getElementById('title-team1').innerText = teams[1].name;
+      document.getElementById('title-team2').innerText = teams[2].name;
+      document.getElementById('tag-team1').innerText = teams[1].name;
+      document.getElementById('tag-team2').innerText = teams[2].name;
+
+      document.getElementById('screen-login').classList.remove('active');
+      document.getElementById('screen-game').classList.add('active');
+
+      generateTeamDeck(1);
+      generateTeamDeck(2);
+    }
+
+    function generateTeamDeck(teamId) {
+      const deckElem = document.getElementById(`deck-team${teamId}`);
+      deckElem.innerHTML = '';
+      
+      const shuffled = [...databaseItems].sort(() => Math.random() - 0.5);
+
+      shuffled.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.draggable = true;
+        card.id = `card-t${teamId}-${item.id}`;
+        card.dataset.isBio = item.isBio;
+        
+        card.innerHTML = `
+          <div class="icon">${item.icon}</div>
+          <div class="name">${item.name}</div>
+        `;
+
+        // Fitur 1: Drag & Drop
+        card.ondragstart = (e) => {
+          e.dataTransfer.setData('text/plain', JSON.stringify({
+            teamId: teamId,
+            cardId: card.id,
+            isBio: item.isBio
+          }));
+        };
+
+        // Fitur 2: Tap to Select (Cadangan Praktis untuk Screen PID)
+        card.onclick = () => handleCardTap(teamId, card, item.isBio);
+
+        deckElem.appendChild(card);
+      });
+    }
+
+    function handleCardTap(teamId, cardElem, isBio) {
+      // Hapus seleksi sebelumnya di tim yang sama
+      const prevSelected = document.querySelector(`#deck-team${teamId} .item-card.selected`);
+      if (prevSelected) prevSelected.classList.remove('selected');
+
+      cardElem.classList.add('selected');
+      teams[teamId].selectedCard = { cardId: cardElem.id, isBio: isBio, elem: cardElem };
+    }
+
+    function handleBoxTap(teamId, droppedOnBio) {
+      const selected = teams[teamId].selectedCard;
+      if (!selected) return; // Jika tidak ada kartu yang dipillih
+
+      processAnswer(teamId, selected.cardId, selected.isBio, droppedOnBio, selected.elem);
+      teams[teamId].selectedCard = null;
+    }
+
+    function allowDrop(e) {
+      e.preventDefault();
+    }
+
+    function handleDrop(e, targetTeamId, droppedOnBio) {
+      e.preventDefault();
+
+      const dataRaw = e.dataTransfer.getData('text/plain');
+      if (!dataRaw) return;
+      
+      const data = JSON.parse(dataRaw);
+      if (data.teamId !== targetTeamId) return;
+
+      const cardElem = document.getElementById(data.cardId);
+      processAnswer(targetTeamId, data.cardId, data.isBio, droppedOnBio, cardElem);
+    }
+
+    function processAnswer(teamId, cardId, isBio, droppedOnBio, cardElem) {
+      const isCorrect = (isBio === droppedOnBio);
+
+      if (isCorrect) {
+        if (cardElem) cardElem.remove();
+        teams[teamId].score += 1;
+        
+        updateTeamScoreUI(teamId);
+        moveBoat(teamId, teams[teamId].score);
+
+        if (teams[teamId].score >= WIN_SCORE) {
+          setTimeout(() => showWinnerScreen(teams[teamId].name), 300);
+        }
+      } else {
+        if (cardElem) {
+          cardElem.classList.remove('selected');
+          cardElem.style.borderColor = '#ef4444';
+          cardElem.style.background = '#fef2f2';
+          setTimeout(() => { 
+            cardElem.style.borderColor = '#cbd5e1'; 
+            cardElem.style.background = '#ffffff';
+          }, 500);
+        }
+      }
+    }
+
+    function updateTeamScoreUI(teamId) {
+      document.getElementById(`score-team${teamId}`).innerText = `Skor: ${teams[teamId].score} / ${WIN_SCORE}`;
+    }
+
+    function moveBoat(teamId, score) {
+      const boat = document.getElementById(`boat-${teamId}`);
+      const maxPercent = 84;
+      const newPos = 2 + (score / WIN_SCORE) * maxPercent;
+      boat.style.left = `${newPos}%`;
+    }
+
+    function showWinnerScreen(winnerName) {
+      document.getElementById('screen-game').classList.remove('active');
+      document.getElementById('screen-cert').classList.add('active');
+      document.getElementById('cert-winner-name').innerText = winnerName;
+    }
+  </script>
+</body>
+</html>
